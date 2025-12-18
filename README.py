@@ -1,3 +1,4 @@
 # suisen_sisutem.py
 import numpy as np
-ffffffguj
+import pandas as pd
+import streamlit as st
