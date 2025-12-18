@@ -1,4 +1,3 @@
 # suisen_sisutem.py
-print=2
-numpy=np
+import numpy as np
 ffffffguj
