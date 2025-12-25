@@ -1,0 +1,4 @@
+python -m pip install openpyxl
+panda
+streamit
+numpy
