@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 
 # Excelファイルを読み込み（同じフォルダに配置）
-df = pd.read_excel("京産大　架空データbyチャッピー　1500.xlsx", sheet_name="Sheet1")
+df = pd.read_excel("excell1.xlsx", sheet_name="Sheet1")
 
 # 推薦対象（学科）列、興味・関心、基本情報
 course_columns = ['経済/経済', '経営/マネジメント', '法/法律', '法/法政策', '現代社会/現代社会',
