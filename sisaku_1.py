@@ -65,3 +65,5 @@ if uploaded_file is not None:
         st.subheader("あなたにおすすめの学科")
         for idx, (name, score) in enumerate(recs.items(), 1):
             st.write(f"{idx}. {name}（予測スコア: {score:.2f}）")
+    python -m pip install openpyxl
+    
