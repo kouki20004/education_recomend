@@ -49,6 +49,23 @@ alpha = st.sidebar.slider("特徴量 vs SVD", 0.0, 1.0, 1.0)
 # ===============================
 # データ分割
 # ===============================
+import re
+
+# 列名の前後スペース除去 + 連続空白を1つに + 改行除去
+df.columns = (
+    df.columns.astype(str)
+      .str.replace("\u3000", " ", regex=False)   # 全角スペース→半角
+      .str.replace(r"\s+", " ", regex=True)      # 連続空白→1つ
+      .str.strip()
+)
+
+all_cols = interest_columns + meta_columns + character_columns + subject_columns
+
+missing = [c for c in all_cols if c not in df.columns]
+if missing:
+    st.error("データに存在しない列があります: " + ", ".join(missing))
+    st.write("現在の列名一覧:", list(df.columns))
+    st.stop()
 course_df = df[bunkei_courses + rikei_courses]
 course_columns = bunkei_courses + rikei_courses
 features_df = df[interest_columns + meta_columns + character_columns + subject_columns].copy()
