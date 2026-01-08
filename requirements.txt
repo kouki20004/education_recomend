@@ -1,4 +1,5 @@
-openpyxl
-panda
-streamit
+streamlit
+pandas
 numpy
+openpyxl
+scikit-learn
