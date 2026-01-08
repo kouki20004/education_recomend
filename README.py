@@ -49,26 +49,11 @@ alpha = st.sidebar.slider("特徴量 vs SVD", 0.0, 1.0, 1.0)
 # ===============================
 # データ分割
 # ===============================
-import re
-
-# 列名の前後スペース除去 + 連続空白を1つに + 改行除去
-df.columns = (
-    df.columns.astype(str)
-      .str.replace("\u3000", " ", regex=False)   # 全角スペース→半角
-      .str.replace(r"\s+", " ", regex=True)      # 連続空白→1つ
-      .str.strip()
-)
-
-all_cols = interest_columns + meta_columns + character_columns + subject_columns
-
-missing = [c for c in all_cols if c not in df.columns]
-if missing:
-    st.error("データに存在しない列があります: " + ", ".join(missing))
-    st.write("現在の列名一覧:", list(df.columns))
-    st.stop()
 course_df = df[bunkei_courses + rikei_courses]
 course_columns = bunkei_courses + rikei_courses
-features_df = df[interest_columns + meta_columns + character_columns + subject_columns].copy()
+features_df = df[
+    interest_columns + meta_columns + character_columns + subject_columns
+].copy()
 
 # 重み適用
 features_df[interest_columns] *= interest_w
@@ -92,9 +77,6 @@ def svd_score():
 # 推薦関数
 # ===============================
 def recommend_courses(user_features, bunri, top_n=5):
-    # =========================
-    # 特徴量ベースCF
-    # =========================
     user_vec = np.array(user_features).reshape(1, -1)
     user_vec = user_vec / (np.linalg.norm(user_vec) + 1e-8)
 
@@ -103,9 +85,18 @@ def recommend_courses(user_features, bunri, top_n=5):
 
     similarities = cosine_similarity(user_vec, X)[0]
 
+    # =========================
+    # ★ 満足度を重みとして適用（核心）
+    # =========================
+    satisfaction = df["満足度"].values  # 1〜5想定
+    satisfaction_weight = satisfaction / satisfaction.max()
+
+    weighted_sim = similarities * satisfaction_weight
+
+    # 類似度が小さすぎるもの除外
     top_k = 50
-    top_idx = np.argsort(similarities)[-top_k:]
-    top_sim = similarities[top_idx]
+    top_idx = np.argsort(weighted_sim)[-top_k:]
+    top_sim = weighted_sim[top_idx]
 
     feature_score = (
         np.dot(top_sim, course_df.values[top_idx])
@@ -115,7 +106,7 @@ def recommend_courses(user_features, bunri, top_n=5):
     feature_score = pd.Series(feature_score, index=course_columns)
 
     # =========================
-    # SVDスコア
+    # SVD
     # =========================
     svd_scores = svd_score()
 
@@ -125,7 +116,7 @@ def recommend_courses(user_features, bunri, top_n=5):
     final_score = alpha * feature_score + (1 - alpha) * svd_scores
 
     # =========================
-    # 文理フィルタ（最重要）
+    # 文理フィルタ
     # =========================
     if bunri == "文系":
         final_score = final_score[bunkei_courses]
@@ -133,6 +124,7 @@ def recommend_courses(user_features, bunri, top_n=5):
         final_score = final_score[rikei_courses]
 
     return final_score.sort_values(ascending=False).head(top_n)
+
 
 
 # ===============================
