@@ -136,7 +136,7 @@ def recommend_courses(user_features, bunri, top_n=5):
 # ===============================
 # UI
 # ===============================
-st.title("🎓 京産大 ハイブリッド進路推薦")
+st.title("🎓 京産大 学部学科推薦")
 
 user_features = []
 
@@ -144,7 +144,7 @@ st.subheader("① 興味")
 for col in interest_columns:
     user_features.append((1 if st.checkbox(col) else 0) * interest_w)
 
-st.subheader("② 基本情報")
+st.subheader("② 基本属性")
 gender = st.selectbox("性別", ["男性","女性"])
 bunri = st.selectbox("文理", ["文系","理系"])
 hensachi = st.slider("偏差値", 35, 70, 50)
@@ -177,4 +177,4 @@ if st.button("進路を推薦"):
         st.write(f"スコア: {score:.2f}")
         st.write("**理由：**")
         st.write("・あなたの興味・得意科目と近い学生が多い")
-        st.write("・過去の進学傾向（SVD）を反映")
+        
